@@ -1,0 +1,1336 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="../css/leaflet.css">
+    <link rel="stylesheet" href="../css/L.Control.Locate.min.css">
+    <link rel="stylesheet" href="../css/qgis2web.css">
+    <link rel="stylesheet" href="../css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="../css/filter.css">
+    <link rel="stylesheet" href="../css/nouislider.min.css">
+    <link rel="stylesheet" href="../css/leaflet-control-geocoder.Geocoder.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        html,
+        body,
+        #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <title>GMAP</title>
+
+</head>
+
+<body>
+    <nav id="navbar">
+        <div class="container">
+            <ul>
+                <li><strong><a href="index.html">דף הבית</a> </strong> </li>
+                <li><strong><a href="garage_list.html">רשימת מוסכים</a> </strong> </li>
+                <li><strong><a id="signup-ref" href="signup.html">הרשמה</a></strong></li>
+                <li><strong><a id="login-ref" href="login.html">התחברות</a></strong></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="map"></div>
+    <script src="../JS/qgis2web_expressions.js"></script>
+    <script src="../JS/leaflet.js"></script>
+    <script src="../JS/L.Control.Locate.min.js"></script>
+    <script src="../JS/leaflet.rotatedMarker.js"></script>
+    <script src="../JS/leaflet.pattern.js"></script>
+    <script src="../JS/leaflet-hash.js"></script>
+    <script src="../JS/Autolinker.min.js"></script>
+    <script src="../JS/rbush.min.js"></script>
+    <script src="../JS/labelgun.min.js"></script>
+    <script src="../JS/labels.js"></script>
+    <script src="../JS/leaflet-control-geocoder.Geocoder.js"></script>
+    <script src="../JS/tailDT.js"></script>
+    <script src="../JS/nouislider.min.js"></script>
+    <script src="../JS/wNumb.js"></script>
+    <script src="../data/israel_garages_new_grid_1.js"></script>
+    <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+                highlightLayer.setStyle({
+                    color: '#ffff00',
+                });
+            } else {
+                highlightLayer.setStyle({
+                    fillColor: '#ffff00',
+                    fillOpacity: 1
+                });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl: true, maxZoom: 28, minZoom: 1
+        }).fitBounds([[31.109312675733747, 33.67359082632065], [32.94491377111655, 36.337993064773165]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({ truncate: { length: 30, location: 'smart' } });
+        L.control.locate({ locateOptions: { maxZoom: 19 } }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OSMStandard_0');
+        map.getPane('pane_OSMStandard_0').style.zIndex = 400;
+        var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OSMStandard_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+        function pop_israel_garages_new_grid_1(feature, layer) {
+            layer.on({
+                mouseout: function (e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table id="popupContent">\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Type'] !== null ? autolinker.link(feature.properties['Type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Address'] !== null ? autolinker.link(feature.properties['Address'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['City'] !== null ? autolinker.link(feature.properties['City'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Phone'] !== null ? autolinker.link(feature.properties['Phone'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Services'] !== null ? autolinker.link(feature.properties['Services'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Manager'] !== null ? autolinker.link(feature.properties['Manager'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Week days</strong><br />' + (feature.properties['Week days'] !== null ? autolinker.link(feature.properties['Week days'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Friday</strong><br />' + (feature.properties['Friday'] !== null ? autolinker.link(feature.properties['Friday'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Rating</strong><br />' + (feature.properties['Rating'] !== null ? autolinker.link(feature.properties['Rating'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><a onClick=navigate() id=navLink href=map.html#12/' + autolinker.link(feature.geometry['coordinates'][1] + '/' + feature.geometry['coordinates'][0]) + '>נווט לכאן</a><br />' + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, { maxHeight: 400 });
+        }
+
+        function style_israel_garages_new_grid_1_0(feature) {
+            switch (String(feature.properties['City'])) {
+                case 'אור יהודה':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(160,206,115,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'אשקלון':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(207,191,110,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'באר שבע':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(63,203,88,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'בת ים':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(115,23,200,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'הרצלייה':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(214,63,189,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'חולון':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(240,81,107,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'חיפה':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(132,204,118,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'יהוד':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(95,68,213,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'ירושלים':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(239,184,128,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'לוד':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(188,213,61,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'נתניה':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(54,236,148,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'פתח תקווה':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(97,210,193,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'ראשון לציון':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(122,210,229,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'רחובות':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(230,118,174,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'רמלה':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(91,109,211,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'רמת גן':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(83,144,208,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'תל אביב -יפו':
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(183,62,207,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                default:
+                    return {
+                        pane: 'pane_israel_garages_new_grid_1',
+                        radius: 4.0,
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(202,100,79,1.0)',
+                        interactive: true,
+                    }
+                    break;
+            }
+        }
+        map.createPane('pane_israel_garages_new_grid_1');
+        map.getPane('pane_israel_garages_new_grid_1').style.zIndex = 401;
+        map.getPane('pane_israel_garages_new_grid_1').style['mix-blend-mode'] = 'normal';
+        var layer_israel_garages_new_grid_1 = new L.geoJson(json_israel_garages_new_grid_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_israel_garages_new_grid_1',
+            layerName: 'layer_israel_garages_new_grid_1',
+            pane: 'pane_israel_garages_new_grid_1',
+            onEachFeature: pop_israel_garages_new_grid_1,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_israel_garages_new_grid_1_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_israel_garages_new_grid_1);
+        map.addLayer(layer_israel_garages_new_grid_1);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+            .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+            .title += 'Search for a place';
+        setBounds();
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className = "row";
+        row.id = "all";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className = "col9";
+        col1.id = "mapWindow";
+        col1.style.height = "99%";
+        col1.style.width = "80%";
+        col1.style.display = "inline-block";
+        var col2 = document.createElement('div');
+        col2.className = "col3";
+        col2.id = "menu";
+        col2.style.display = "inline-block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("all").appendChild(col1);
+        document.getElementById("all").appendChild(col2);
+        col1.appendChild(mapDiv)
+        var Filters = { "Rating": "real", "City": "str", "Name": "str", "Week days": "str", "Services": "str", "Friday": "str" };
+        function filterFunc() {
+            map.eachLayer(function (lyr) {
+                if ("options" in lyr && "dataVar" in lyr["options"]) {
+                    features = this[lyr["options"]["dataVar"]].features.slice(0);
+                    try {
+                        for (key in Filters) {
+                            keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                            if (Filters[key] == "str" || Filters[key] == "bool") {
+                                var selection = [];
+                                var options = document.getElementById("sel_" + keyS).options
+                                for (var i = 0; i < options.length; i++) {
+                                    if (options[i].selected) selection.push(options[i].value);
+                                }
+                                try {
+                                    if (key in features[0].properties) {
+                                        for (i = features.length - 1;
+                                            i >= 0; --i) {
+                                            if (selection.indexOf(
+                                                features[i].properties[key]) < 0
+                                                && selection.length > 0) {
+                                                features.splice(i, 1);
+                                            }
+                                        }
+                                    }
+                                } catch (err) {
+                                }
+                            }
+                            if (Filters[key] == "int") {
+                                sliderVals = document.getElementById(
+                                    "div_" + keyS).noUiSlider.get();
+                                try {
+                                    if (key in features[0].properties) {
+                                        for (i = features.length - 1; i >= 0; --i) {
+                                            if (parseInt(features[i].properties[key])
+                                                < sliderVals[0]
+                                                || parseInt(features[i].properties[key])
+                                                > sliderVals[1]) {
+                                                features.splice(i, 1);
+                                            }
+                                        }
+                                    }
+                                } catch (err) {
+                                }
+                            }
+                            if (Filters[key] == "real") {
+                                sliderVals = document.getElementById(
+                                    "div_" + keyS).noUiSlider.get();
+                                try {
+                                    if (key in features[0].properties) {
+                                        for (i = features.length - 1; i >= 0; --i) {
+                                            if (features[i].properties[key]
+                                                < sliderVals[0]
+                                                || features[i].properties[key]
+                                                > sliderVals[1]) {
+                                                features.splice(i, 1);
+                                            }
+                                        }
+                                    }
+                                } catch (err) {
+                                }
+                            }
+                            if (Filters[key] == "date"
+                                || Filters[key] == "datetime"
+                                || Filters[key] == "time") {
+                                try {
+                                    if (key in features[0].properties) {
+                                        HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                                        startdate = document.getElementById("dat_" +
+                                            HTMLkey + "_date1").value.replace(" ", "T");
+                                        enddate = document.getElementById("dat_" +
+                                            HTMLkey + "_date2").value.replace(" ", "T");
+                                        for (i = features.length - 1; i >= 0; --i) {
+                                            if (features[i].properties[key] < startdate
+                                                || features[i].properties[key] > enddate) {
+                                                features.splice(i, 1);
+                                            }
+                                        }
+                                    }
+                                } catch (err) {
+                                }
+                            }
+                        }
+                    } catch (err) {
+                    }
+                    this[lyr["options"]["layerName"]].clearLayers();
+                    this[lyr["options"]["layerName"]].addData(features);
+                }
+            })
+        }
+        document.getElementById("menu").appendChild(
+            document.createElement("div"));
+        var div_Rating = document.createElement("div");
+        div_Rating.id = "div_Rating";
+        div_Rating.className = "slider";
+        document.getElementById("menu").appendChild(div_Rating);
+        var lab_Rating = document.createElement('div');
+        lab_Rating.innerHTML = 'דירוג: <span id="val_Rating"></span>';
+        lab_Rating.className = 'filterlabel';
+        document.getElementById("menu").appendChild(lab_Rating);
+        var reset_Rating = document.createElement('div');
+        reset_Rating.innerHTML = 'נקה פילטר';
+        reset_Rating.className = 'filterlabel';
+        lab_Rating.className = 'filterlabel';
+        reset_Rating.onclick = function () {
+            sel_Rating.noUiSlider.reset();
+        };
+        document.getElementById("menu").appendChild(reset_Rating);
+        var sel_Rating = document.getElementById('div_Rating');
+        noUiSlider.create(sel_Rating, {
+            connect: true,
+            start: [3.0, 5.0],
+            range: {
+                min: 3.0,
+                max: 5.0
+            }
+        });
+        sel_Rating.noUiSlider.on('update', function (values) {
+            val_Rating = document.getElementById('val_Rating');
+            val_Rating.innerHTML = values.join(' - ');
+            filterFunc()
+        });
+        document.getElementById("menu").appendChild(
+            document.createElement("div"));
+        var div_City = document.createElement('div');
+        div_City.id = "div_City";
+        div_City.className = "filterselect";
+        document.getElementById("menu").appendChild(div_City);
+        sel_City = document.createElement('select');
+        sel_City.multiple = true;
+        sel_City.size = 5;
+        sel_City.id = "sel_City";
+        var City_options_str = "<option value='' unselected></option>";
+        sel_City.onchange = function () { filterFunc() };
+        City_options_str += '<option value="אור יהודה">אור יהודה</option>';
+        City_options_str += '<option value="אשקלון">אשקלון</option>';
+        City_options_str += '<option value="באר שבע">באר שבע</option>';
+        City_options_str += '<option value="בת ים">בת ים</option>';
+        City_options_str += '<option value="הרצלייה">הרצלייה</option>';
+        City_options_str += '<option value="חולון">חולון</option>';
+        City_options_str += '<option value="חיפה">חיפה</option>';
+        City_options_str += '<option value="יהוד">יהוד</option>';
+        City_options_str += '<option value="ירושלים">ירושלים</option>';
+        City_options_str += '<option value="לוד">לוד</option>';
+        City_options_str += '<option value="נתניה">נתניה</option>';
+        City_options_str += '<option value="פתח תקווה">פתח תקווה</option>';
+        City_options_str += '<option value="ראשון לציון">ראשון לציון</option>';
+        City_options_str += '<option value="רחובות">רחובות</option>';
+        City_options_str += '<option value="רמלה">רמלה</option>';
+        City_options_str += '<option value="רמת גן">רמת גן</option>';
+        City_options_str += '<option value="תל אביב -יפו">תל אביב -יפו</option>';
+        sel_City.innerHTML = City_options_str;
+        div_City.appendChild(sel_City);
+        var lab_City = document.createElement('div');
+        lab_City.innerHTML = 'עיר';
+        lab_City.className = 'filterlabel';
+        div_City.appendChild(lab_City);
+        var reset_City = document.createElement('div');
+        reset_City.innerHTML = 'נקה פילטר';
+        reset_City.className = 'filterlabel';
+        reset_City.onclick = function () {
+            var options = document.getElementById("sel_City").options;
+            for (var i = 0; i < options.length; i++) {
+                options[i].selected = false;
+            }
+            filterFunc();
+        };
+        div_City.appendChild(reset_City);
+        document.getElementById("menu").appendChild(
+            document.createElement("div"));
+        var div_Name = document.createElement('div');
+        div_Name.id = "div_Name";
+        div_Name.className = "filterselect";
+        document.getElementById("menu").appendChild(div_Name);
+        sel_Name = document.createElement('select');
+        sel_Name.multiple = true;
+        sel_Name.size = 5;
+        sel_Name.id = "sel_Name";
+        var Name_options_str = "<option value='' unselected></option>";
+        sel_Name.onchange = function () { filterFunc() };
+        Name_options_str += '<option value=".צלאל רועי גלגלי העיר">.צלאל רועי גלגלי העיר</option>';
+        Name_options_str += '<option value="א.א מוסך הסרגל">א.א מוסך הסרגל</option>';
+        Name_options_str += '<option value="א.א. אקספרס פחחות רכב בע מ">א.א. אקספרס פחחות רכב בע מ</option>';
+        Name_options_str += '<option value="א.א. רוני מוסך כללי בע מ">א.א. רוני מוסך כללי בע מ</option>';
+        Name_options_str += '<option value="א.ארגמן סוכנות דרום בע מ">א.ארגמן סוכנות דרום בע מ</option>';
+        Name_options_str += '<option value="א.ב.רם גלס בע מ">א.ב.רם גלס בע מ</option>';
+        Name_options_str += '<option value="א.ד טקסי (2013) בע מ מוסך ארגמן">א.ד טקסי (2013) בע מ מוסך ארגמן</option>';
+        Name_options_str += '<option value="א.ה.ק. האחים בע מ">א.ה.ק. האחים בע מ</option>';
+        Name_options_str += '<option value="א.ח . המבריק פחחות וצבע בע מ">א.ח . המבריק פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="א.ע.מ שרותי רכב  איימן אבו צעלוק">א.ע.מ שרותי רכב  איימן אבו צעלוק</option>';
+        Name_options_str += '<option value="א.ר מוסכים - אלטשולר אלכסיי">א.ר מוסכים - אלטשולר אלכסיי</option>';
+        Name_options_str += '<option value="א.ר. ניר רחובות בע מ">א.ר. ניר רחובות בע מ</option>';
+        Name_options_str += '<option value="א.רכב רחובות בע מ">א.רכב רחובות בע מ</option>';
+        Name_options_str += '<option value="אבו סביח אמין - צמיגי בקעה">אבו סביח אמין - צמיגי בקעה</option>';
+        Name_options_str += '<option value="אבי איתור מיגון ושמע בע מ">אבי איתור מיגון ושמע בע מ</option>';
+        Name_options_str += '<option value="אביבי עובדיה הסעות וטיולים בע מ">אביבי עובדיה הסעות וטיולים בע מ</option>';
+        Name_options_str += '<option value="אבניר חב&apos; לרכב בע מ">אבניר חב&apos; לרכב בע מ</option>';
+        Name_options_str += '<option value="אגד חברה לתחבורה  בע מ">אגד חברה לתחבורה  בע מ</option>';
+        Name_options_str += '<option value="אדמון יעקב המהיר">אדמון יעקב המהיר</option>';
+        Name_options_str += '<option value="אדר אשר מוסך סייר">אדר אשר מוסך סייר</option>';
+        Name_options_str += '<option value="אדרי מרק - אוטו מרקו">אדרי מרק - אוטו מרקו</option>';
+        Name_options_str += '<option value="אהוד בן נון מוסך בורדו">אהוד בן נון מוסך בורדו</option>';
+        Name_options_str += '<option value="אהרון את אסד צמיגי אנטון">אהרון את אסד צמיגי אנטון</option>';
+        Name_options_str += '<option value="אהרון משה מוסך הפלד">אהרון משה מוסך הפלד</option>';
+        Name_options_str += '<option value="אודיוה ארט - דוד אלכסנדרוב">אודיוה ארט - דוד אלכסנדרוב</option>';
+        Name_options_str += '<option value="אוטו - טופ בנגב בע מ">אוטו - טופ בנגב בע מ</option>';
+        Name_options_str += '<option value="אוטו אור רמלה 2008 בע מ">אוטו אור רמלה 2008 בע מ</option>';
+        Name_options_str += '<option value="אוטו בנץ בע מ">אוטו בנץ בע מ</option>';
+        Name_options_str += '<option value="אוטו גיר בע מ">אוטו גיר בע מ</option>';
+        Name_options_str += '<option value="אוטו גלס זגגות רכב בע מ">אוטו גלס זגגות רכב בע מ</option>';
+        Name_options_str += '<option value="אוטוטרוניק  יניקייב מקסים">אוטוטרוניק  יניקייב מקסים</option>';
+        Name_options_str += '<option value="און ) י.ק.ל ( פחחות וצבע בע מ">און ) י.ק.ל ( פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="און קור מאירי כפיר">און קור מאירי כפיר</option>';
+        Name_options_str += '<option value="אופיר המכונאי האקדמאי בע מ">אופיר המכונאי האקדמאי בע מ</option>';
+        Name_options_str += '<option value="אופיר מוטורבייק  - אופיר חגג">אופיר מוטורבייק  - אופיר חגג</option>';
+        Name_options_str += '<option value="אופנובייק-מאור ושגיב">אופנובייק-מאור ושגיב</option>';
+        Name_options_str += '<option value="אופנועי הגשר בע מ">אופנועי הגשר בע מ</option>';
+        Name_options_str += '<option value="אור - צת שרותי רכב בע מ">אור - צת שרותי רכב בע מ</option>';
+        Name_options_str += '<option value="אורי את אורית מוסך אורי אופנועים">אורי את אורית מוסך אורי אופנועים</option>';
+        Name_options_str += '<option value="אורן בן סימון שרותי רכב בע מ">אורן בן סימון שרותי רכב בע מ</option>';
+        Name_options_str += '<option value="אחד על אחד יעוץ לדו גלגלי בע מ">אחד על אחד יעוץ לדו גלגלי בע מ</option>';
+        Name_options_str += '<option value="אחים שאלתיאל מוסך נאמן בע מ">אחים שאלתיאל מוסך נאמן בע מ</option>';
+        Name_options_str += '<option value="אטבה יובל מוסך יובל">אטבה יובל מוסך יובל</option>';
+        Name_options_str += '<option value="איגור את לונגו מוסך בימר">איגור את לונגו מוסך בימר</option>';
+        Name_options_str += '<option value="אילן קארגלס בע מ">אילן קארגלס בע מ</option>';
+        Name_options_str += '<option value="אימפריה אקספרס בע מ">אימפריה אקספרס בע מ</option>';
+        Name_options_str += '<option value="איציק בו שושן מוסך">איציק בו שושן מוסך</option>';
+        Name_options_str += '<option value="איציק בן אלי - צמיגי דוידו">איציק בן אלי - צמיגי דוידו</option>';
+        Name_options_str += '<option value="איציק זקן מוסך הנציב">איציק זקן מוסך הנציב</option>';
+        Name_options_str += '<option value="אישימוטו בע מ">אישימוטו בע מ</option>';
+        Name_options_str += '<option value="איתי מוטורס בע מ">איתי מוטורס בע מ</option>';
+        Name_options_str += '<option value="אל חטיב גואד צמיגי ג&apos;ו חולון">אל חטיב גואד צמיגי ג&apos;ו חולון</option>';
+        Name_options_str += '<option value="אלוס צבי תיקון צמיגים">אלוס צבי תיקון צמיגים</option>';
+        Name_options_str += '<option value="אלי את אלי דושיבע מ">אלי את אלי דושיבע מ</option>';
+        Name_options_str += '<option value="אלי ברכה בע מ">אלי ברכה בע מ</option>';
+        Name_options_str += '<option value="אליה יצחק מוסך דניאל">אליה יצחק מוסך דניאל</option>';
+        Name_options_str += '<option value="אליצור אמנון ויוסי שמש מוסך צפון">אליצור אמנון ויוסי שמש מוסך צפון</option>';
+        Name_options_str += '<option value="אלירן מלול - אלירן מוטורס">אלירן מלול - אלירן מוטורס</option>';
+        Name_options_str += '<option value="אלכס זאיד - אנרגי שרותי רכב">אלכס זאיד - אנרגי שרותי רכב</option>';
+        Name_options_str += '<option value="אלכס חשמל רכב - דורון ויאיר">אלכס חשמל רכב - דורון ויאיר</option>';
+        Name_options_str += '<option value="אלעיסאוי עומר צמיגי טופ טיפ">אלעיסאוי עומר צמיגי טופ טיפ</option>';
+        Name_options_str += '<option value="אלעיסאוי עלי פנצ&apos;ריית דרום ראשון">אלעיסאוי עלי פנצ&apos;ריית דרום ראשון</option>';
+        Name_options_str += '<option value="אלקובי משה - אלקובי אלברט ובנו">אלקובי משה - אלקובי אלברט ובנו</option>';
+        Name_options_str += '<option value="אלקטרו גיר - בנימין אורן">אלקטרו גיר - בנימין אורן</option>';
+        Name_options_str += '<option value="אלקס מאיר _ אגזוז">אלקס מאיר _ אגזוז</option>';
+        Name_options_str += '<option value="אם.וי אס מוטור בע מ">אם.וי אס מוטור בע מ</option>';
+        Name_options_str += '<option value="אמ.סי.מוטורס בע מ">אמ.סי.מוטורס בע מ</option>';
+        Name_options_str += '<option value="אמבר עזרא מוסך נייד  לי ">אמבר עזרא מוסך נייד  לי </option>';
+        Name_options_str += '<option value="אמייזינגלי שירותי רכב בע מ">אמייזינגלי שירותי רכב בע מ</option>';
+        Name_options_str += '<option value="אמיר מונדיה - צמיגי רם">אמיר מונדיה - צמיגי רם</option>';
+        Name_options_str += '<option value="אמנון ינאי רדייטורים ואגזוזים">אמנון ינאי רדייטורים ואגזוזים</option>';
+        Name_options_str += '<option value="אמסלם יהודה מכונאות חשמל ומיזוג">אמסלם יהודה מכונאות חשמל ומיזוג</option>';
+        Name_options_str += '<option value="אמסלם שלמה חשמל הגינגי&apos;">אמסלם שלמה חשמל הגינגי&apos;</option>';
+        Name_options_str += '<option value="אמרד רדיאטורים בע מ">אמרד רדיאטורים בע מ</option>';
+        Name_options_str += '<option value="אסקרוב חיים מוסך אמיר">אסקרוב חיים מוסך אמיר</option>';
+        Name_options_str += '<option value="אסרף ליאור מוסך הסלע">אסרף ליאור מוסך הסלע</option>';
+        Name_options_str += '<option value="אקסטרים מוטוספורט 1 בע מ">אקסטרים מוטוספורט 1 בע מ</option>';
+        Name_options_str += '<option value="אקסטרים מוטורס - אדיר בלולו">אקסטרים מוטורס - אדיר בלולו</option>';
+        Name_options_str += '<option value="ארז בן ששון מוסך ארז 4 על 4">ארז בן ששון מוסך ארז 4 על 4</option>';
+        Name_options_str += '<option value="אריאל נדיב מוסך נדיב בייק">אריאל נדיב מוסך נדיב בייק</option>';
+        Name_options_str += '<option value="אריה כהן שרותי חשמל ומיזוג לרכב">אריה כהן שרותי חשמל ומיזוג לרכב</option>';
+        Name_options_str += '<option value="ארן אמויאל בע מ">ארן אמויאל בע מ</option>';
+        Name_options_str += '<option value="ארצי מוטורס בע מ">ארצי מוטורס בע מ</option>';
+        Name_options_str += '<option value="אשר חן מוסך הנסיכה">אשר חן מוסך הנסיכה</option>';
+        Name_options_str += '<option value="אשר עוזי רדיו התחנה">אשר עוזי רדיו התחנה</option>';
+        Name_options_str += '<option value="ב.ג מוסכים 2000 בע מ">ב.ג מוסכים 2000 בע מ</option>';
+        Name_options_str += '<option value="ב.ה ארביב ניסים בע מ">ב.ה ארביב ניסים בע מ</option>';
+        Name_options_str += '<option value="ב.ה פיקס שירותי רכב בע מ">ב.ה פיקס שירותי רכב בע מ</option>';
+        Name_options_str += '<option value="ב.ח.שיווק ושרות רכבים בע מ">ב.ח.שיווק ושרות רכבים בע מ</option>';
+        Name_options_str += '<option value="ב.מ עדן שירותי רכב בע מ">ב.מ עדן שירותי רכב בע מ</option>';
+        Name_options_str += '<option value="ב.ע.ל צמיגי אקסטרא (2008) בע מ">ב.ע.ל צמיגי אקסטרא (2008) בע מ</option>';
+        Name_options_str += '<option value="בדר סראחנה - מוסך ויינר 2018">בדר סראחנה - מוסך ויינר 2018</option>';
+        Name_options_str += '<option value="בדש ציון מוסך הדלק">בדש ציון מוסך הדלק</option>';
+        Name_options_str += '<option value="בולוס ג&apos;יריס מוסך קרוזר למכונאות">בולוס ג&apos;יריס מוסך קרוזר למכונאות</option>';
+        Name_options_str += '<option value="ביטון חיים מוסך צמרת">ביטון חיים מוסך צמרת</option>';
+        Name_options_str += '<option value="בים חאתם - מוסך הבודק">בים חאתם - מוסך הבודק</option>';
+        Name_options_str += '<option value="בית הצמיג חברת צמיגים בע מ">בית הצמיג חברת צמיגים בע מ</option>';
+        Name_options_str += '<option value="בל מוטורס בסד בע מ">בל מוטורס בסד בע מ</option>';
+        Name_options_str += '<option value="בלאיש דוד מוטו סקוטר קטנועים">בלאיש דוד מוטו סקוטר קטנועים</option>';
+        Name_options_str += '<option value="בלומנפלד מאיר מחוונים וטכוגרפים">בלומנפלד מאיר מחוונים וטכוגרפים</option>';
+        Name_options_str += '<option value="בליץ אלקטריק מוטורס בע מ">בליץ אלקטריק מוטורס בע מ</option>';
+        Name_options_str += '<option value="בני רומי צמיגים">בני רומי צמיגים</option>';
+        Name_options_str += '<option value="בנימין מכון האחים">בנימין מכון האחים</option>';
+        Name_options_str += '<option value="בצלאל גיא-אלגק גיאגלס">בצלאל גיא-אלגק גיאגלס</option>';
+        Name_options_str += '<option value="ברהם אחמד - פנצריה">ברהם אחמד - פנצריה</option>';
+        Name_options_str += '<option value="ברוך יצחק - פרונט איציק">ברוך יצחק - פרונט איציק</option>';
+        Name_options_str += '<option value="ברכיל סאני חשמל רם">ברכיל סאני חשמל רם</option>';
+        Name_options_str += '<option value="ברק אור שרותי (1995)בע מ">ברק אור שרותי (1995)בע מ</option>';
+        Name_options_str += '<option value="ג יי גז בע מ מכונאות גפמ&apos; לרכב">ג יי גז בע מ מכונאות גפמ&apos; לרכב</option>';
+        Name_options_str += '<option value="ג&apos;מאמעה נאג&apos;י בע מ">ג&apos;מאמעה נאג&apos;י בע מ</option>';
+        Name_options_str += '<option value="ג.מ פורטל בע מ">ג.מ פורטל בע מ</option>';
+        Name_options_str += '<option value="ג.מ.פורטל סחר ויבוא בע מ">ג.מ.פורטל סחר ויבוא בע מ</option>';
+        Name_options_str += '<option value="גאנית עזאם מוסך פיליפ">גאנית עזאם מוסך פיליפ</option>';
+        Name_options_str += '<option value="גד ורפאל שות&apos;">גד ורפאל שות&apos;</option>';
+        Name_options_str += '<option value="גדי את יניב מוסך גדי ודוד">גדי את יניב מוסך גדי ודוד</option>';
+        Name_options_str += '<option value="גוטפריד אלכסנדר מוסך א.א.">גוטפריד אלכסנדר מוסך א.א.</option>';
+        Name_options_str += '<option value="גיל מלווין - מוסך לאופנועים">גיל מלווין - מוסך לאופנועים</option>';
+        Name_options_str += '<option value="גלוסקא שרותי .רכב בע מ">גלוסקא שרותי .רכב בע מ</option>';
+        Name_options_str += '<option value="גליסקו דולב - דולב מוטורס">גליסקו דולב - דולב מוטורס</option>';
+        Name_options_str += '<option value="גנח אפרים פחחות וצבע">גנח אפרים פחחות וצבע</option>';
+        Name_options_str += '<option value="גרוס שאדי עבודת פחחות וצבע בע מ">גרוס שאדי עבודת פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="גרוסמן אריה מכונאות רכב">גרוסמן אריה מכונאות רכב</option>';
+        Name_options_str += '<option value="גריסי את שטרית - דוד את אהרון">גריסי את שטרית - דוד את אהרון</option>';
+        Name_options_str += '<option value="ד . א . הרשת לצמיגים בע מ">ד . א . הרשת לצמיגים בע מ</option>';
+        Name_options_str += '<option value="ד ר פח וצבע בע מ">ד ר פח וצבע בע מ</option>';
+        Name_options_str += '<option value="ד ר פח וצבע חיפה בע מ">ד ר פח וצבע חיפה בע מ</option>';
+        Name_options_str += '<option value="ד ר פח וצבע מרכז בע מ">ד ר פח וצבע מרכז בע מ</option>';
+        Name_options_str += '<option value="ד ר פח וצבע קרני אור רחובות בע מ">ד ר פח וצבע קרני אור רחובות בע מ</option>';
+        Name_options_str += '<option value="ד.שוקרון כיווני פרונט 2014 בע מ">ד.שוקרון כיווני פרונט 2014 בע מ</option>';
+        Name_options_str += '<option value="דהן עמרם צמיגי עמי">דהן עמרם צמיגי עמי</option>';
+        Name_options_str += '<option value="דהן שלום מוסך שלום">דהן שלום מוסך שלום</option>';
+        Name_options_str += '<option value="דוזן מוסך פחחות וצבע בע מ">דוזן מוסך פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="דור ניסים מוסך דור מוטורס">דור ניסים מוסך דור מוטורס</option>';
+        Name_options_str += '<option value="דניאל פרסטין מוסך הסדנא">דניאל פרסטין מוסך הסדנא</option>';
+        Name_options_str += '<option value="דרויש גורג חשמל רכב צפון">דרויש גורג חשמל רכב צפון</option>';
+        Name_options_str += '<option value="דרויש שלום מוסך היוזמים">דרויש שלום מוסך היוזמים</option>';
+        Name_options_str += '<option value="דרך הכביש פחחות וצבע לרכב בע מ">דרך הכביש פחחות וצבע לרכב בע מ</option>';
+        Name_options_str += '<option value="דרכים מרכזי שירות לרכב בע מ">דרכים מרכזי שירות לרכב בע מ</option>';
+        Name_options_str += '<option value="ה.מ.מוטורס בע מ">ה.מ.מוטורס בע מ</option>';
+        Name_options_str += '<option value="האחים נאג&apos;ר בע מ">האחים נאג&apos;ר בע מ</option>';
+        Name_options_str += '<option value="הוליווד ר. מ. וצמיגי פרויד בע מ">הוליווד ר. מ. וצמיגי פרויד בע מ</option>';
+        Name_options_str += '<option value="הילוך שישי מערב ראשון בע מ">הילוך שישי מערב ראשון בע מ</option>';
+        Name_options_str += '<option value="המדביק בע מ">המדביק בע מ</option>';
+        Name_options_str += '<option value="המוסך המרכזי לאופנועים אמיגה">המוסך המרכזי לאופנועים אמיגה</option>';
+        Name_options_str += '<option value="הן כדורי צמיגי רמת גן">הן כדורי צמיגי רמת גן</option>';
+        Name_options_str += '<option value="השחר מוטורס 2000 בע מ">השחר מוטורס 2000 בע מ</option>';
+        Name_options_str += '<option value="וויס אברהם מוסך גחלת">וויס אברהם מוסך גחלת</option>';
+        Name_options_str += '<option value="וייס עירן ספידומטר">וייס עירן ספידומטר</option>';
+        Name_options_str += '<option value="ויקטור גרסי צבעות רכב">ויקטור גרסי צבעות רכב</option>';
+        Name_options_str += '<option value="ויקטור לק רדיאטורים ואגזוזים">ויקטור לק רדיאטורים ואגזוזים</option>';
+        Name_options_str += '<option value="ויקי גולן מצילי המכוניות">ויקי גולן מצילי המכוניות</option>';
+        Name_options_str += '<option value="ושציב אולג - מוסך מקסי">ושציב אולג - מוסך מקסי</option>';
+        Name_options_str += '<option value="זאב דיין שרותי בלמים בת ים בע מ">זאב דיין שרותי בלמים בת ים בע מ</option>';
+        Name_options_str += '<option value="זאדה מוסך">זאדה מוסך</option>';
+        Name_options_str += '<option value="זוננברג דב מוסך יאב חיפה">זוננברג דב מוסך יאב חיפה</option>';
+        Name_options_str += '<option value="זכוכית אשקלון בע מ">זכוכית אשקלון בע מ</option>';
+        Name_options_str += '<option value="זכוכית מרכז זגגות טרקטורים בע מ">זכוכית מרכז זגגות טרקטורים בע מ</option>';
+        Name_options_str += '<option value="ח.מ. חולון מטורס (2010) בע מ">ח.מ. חולון מטורס (2010) בע מ</option>';
+        Name_options_str += '<option value="חאלד שייח סולימאן מיתל קאר">חאלד שייח סולימאן מיתל קאר</option>';
+        Name_options_str += '<option value="חברת המזרח לשיווקמכוניות(1994)בע">חברת המזרח לשיווקמכוניות(1994)בע</option>';
+        Name_options_str += '<option value="חג&apos;ג דניאל אגזוזי קרן">חג&apos;ג דניאל אגזוזי קרן</option>';
+        Name_options_str += '<option value="חג&apos;ג&apos; מאיר מוסך מרתון">חג&apos;ג&apos; מאיר מוסך מרתון</option>';
+        Name_options_str += '<option value="חדד צביקה מכונאות רכב">חדד צביקה מכונאות רכב</option>';
+        Name_options_str += '<option value="חולי משה - מוסך חולי לפחחות וצבע">חולי משה - מוסך חולי לפחחות וצבע</option>';
+        Name_options_str += '<option value="חי לוי קור בע מ">חי לוי קור בע מ</option>';
+        Name_options_str += '<option value="חיו יחזקאל מוסך אמיר וחזי">חיו יחזקאל מוסך אמיר וחזי</option>';
+        Name_options_str += '<option value="חיים ודרור מוסך הדרום 2018">חיים ודרור מוסך הדרום 2018</option>';
+        Name_options_str += '<option value="חיימוב אדוארד מוסך הצפירה">חיימוב אדוארד מוסך הצפירה</option>';
+        Name_options_str += '<option value="חמני ברוך חשמל רכב">חמני ברוך חשמל רכב</option>';
+        Name_options_str += '<option value="חן יוסף קטנועי חן">חן יוסף קטנועי חן</option>';
+        Name_options_str += '<option value="חן שמעון מוסך אלי אשכנזי">חן שמעון מוסך אלי אשכנזי</option>';
+        Name_options_str += '<option value="חנאניא ויקטור צמיגי אנטון חנניה">חנאניא ויקטור צמיגי אנטון חנניה</option>';
+        Name_options_str += '<option value="חסן את אברהים מוסך שבח">חסן את אברהים מוסך שבח</option>';
+        Name_options_str += '<option value="חצב נציגויות בע מ">חצב נציגויות בע מ</option>';
+        Name_options_str += '<option value="חרומוב יבגני מוסך גז קו">חרומוב יבגני מוסך גז קו</option>';
+        Name_options_str += '<option value="חשמל ומיזוג ג&apos;קי בע מ">חשמל ומיזוג ג&apos;קי בע מ</option>';
+        Name_options_str += '<option value="טואיטו אלי המרכז">טואיטו אלי המרכז</option>';
+        Name_options_str += '<option value="טוטלוס דוד שי זר בע מ">טוטלוס דוד שי זר בע מ</option>';
+        Name_options_str += '<option value="טולדנו איחוד מוסכים 2008">טולדנו איחוד מוסכים 2008</option>';
+        Name_options_str += '<option value="טופ גיר - חדד עופר">טופ גיר - חדד עופר</option>';
+        Name_options_str += '<option value="טיג איינגנירינג אנד מוטורספורט">טיג איינגנירינג אנד מוטורספורט</option>';
+        Name_options_str += '<option value="טיייר סנטר רשת צמיגים בע מ">טיייר סנטר רשת צמיגים בע מ</option>';
+        Name_options_str += '<option value="טל קדם אופנועי הבורסה">טל קדם אופנועי הבורסה</option>';
+        Name_options_str += '<option value="טפליצקי איגור צמיגי לב העיר">טפליצקי איגור צמיגי לב העיר</option>';
+        Name_options_str += '<option value="י. קארו שרותי פחחות וצבע בע מ">י. קארו שרותי פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="י.א אילן פחחות וצבע בע מ">י.א אילן פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="י.ל.מגה מוסך בע מ">י.ל.מגה מוסך בע מ</option>';
+        Name_options_str += '<option value="י.ק. מוטוקלאס בע מ">י.ק. מוטוקלאס בע מ</option>';
+        Name_options_str += '<option value="יאסין כמאל מוסך שמוליק 2018">יאסין כמאל מוסך שמוליק 2018</option>';
+        Name_options_str += '<option value="יהודה אלול - מוסך האומנים י.א">יהודה אלול - מוסך האומנים י.א</option>';
+        Name_options_str += '<option value="יו אר וי מוטורס בע מ">יו אר וי מוטורס בע מ</option>';
+        Name_options_str += '<option value="יו. אס. אי. אי בע מ">יו. אס. אי. אי בע מ</option>';
+        Name_options_str += '<option value="יומי חשמלאות רכב - עזרה אברהם">יומי חשמלאות רכב - עזרה אברהם</option>';
+        Name_options_str += '<option value="יוניברסל מוטורס ישראל בעמ">יוניברסל מוטורס ישראל בעמ</option>';
+        Name_options_str += '<option value="יוניון רכב תעשייתי בע מ">יוניון רכב תעשייתי בע מ</option>';
+        Name_options_str += '<option value="יוסי כל קטנוע">יוסי כל קטנוע</option>';
+        Name_options_str += '<option value="יוסף אלעוברה מוסך לב העיר">יוסף אלעוברה מוסך לב העיר</option>';
+        Name_options_str += '<option value="ינאי נחושתן מוסך רן סייקל">ינאי נחושתן מוסך רן סייקל</option>';
+        Name_options_str += '<option value="יעקב את אבי שרות חשמל המצבר">יעקב את אבי שרות חשמל המצבר</option>';
+        Name_options_str += '<option value="יעקב את ששי - מוסך יש">יעקב את ששי - מוסך יש</option>';
+        Name_options_str += '<option value="יצחק אילן - המוסך של אילן">יצחק אילן - המוסך של אילן</option>';
+        Name_options_str += '<option value="יצחק מזרחי מוטו בייק אמינות">יצחק מזרחי מוטו בייק אמינות</option>';
+        Name_options_str += '<option value="יצחקי ארז - ארז אופנועים">יצחקי ארז - ארז אופנועים</option>';
+        Name_options_str += '<option value="כהן ארז אגזוזים">כהן ארז אגזוזים</option>';
+        Name_options_str += '<option value="כהן ארזי רפי מוסך ארזים">כהן ארזי רפי מוסך ארזים</option>';
+        Name_options_str += '<option value="כהן את קונצק מוסך מגן">כהן את קונצק מוסך מגן</option>';
+        Name_options_str += '<option value="כהן ז&apos;וזו&apos; מוסך ז&apos;וזו&apos;">כהן ז&apos;וזו&apos; מוסך ז&apos;וזו&apos;</option>';
+        Name_options_str += '<option value="כהן חיים מוסך מאיר למכונאות">כהן חיים מוסך מאיר למכונאות</option>';
+        Name_options_str += '<option value="כהן סמי שרותי חשמל">כהן סמי שרותי חשמל</option>';
+        Name_options_str += '<option value="כהנא אברהם מוסך מרום חן">כהנא אברהם מוסך מרום חן</option>';
+        Name_options_str += '<option value="כפיר בלמים בע מ">כפיר בלמים בע מ</option>';
+        Name_options_str += '<option value="לב קסנוב את איציק הללה מוסך לב">לב קסנוב את איציק הללה מוסך לב</option>';
+        Name_options_str += '<option value="לגזיאל מרדכי-מ.לגזיאל שירותי רכב">לגזיאל מרדכי-מ.לגזיאל שירותי רכב</option>';
+        Name_options_str += '<option value="לוי חיים מוסך ראלינג">לוי חיים מוסך ראלינג</option>';
+        Name_options_str += '<option value="לוי חנן מוסך חנן">לוי חנן מוסך חנן</option>';
+        Name_options_str += '<option value="לויטו יבגני מוסך אלמר">לויטו יבגני מוסך אלמר</option>';
+        Name_options_str += '<option value="לונדון יעקב אומן מוטורס">לונדון יעקב אומן מוטורס</option>';
+        Name_options_str += '<option value="ליאור קריטי צמיגי קריטי">ליאור קריטי צמיגי קריטי</option>';
+        Name_options_str += '<option value="לידור מוטורס בע מ">לידור מוטורס בע מ</option>';
+        Name_options_str += '<option value="מ.א. ליין )ש.א.( בע מ">מ.א. ליין )ש.א.( בע מ</option>';
+        Name_options_str += '<option value="מ.ב. גבע שרותי רכב בע מ">מ.ב. גבע שרותי רכב בע מ</option>';
+        Name_options_str += '<option value="מ.דרעי רדיאטורים אגזוזים2015בע מ">מ.דרעי רדיאטורים אגזוזים2015בע מ</option>';
+        Name_options_str += '<option value="מ.נ בדיקת רכב בע מ">מ.נ בדיקת רכב בע מ</option>';
+        Name_options_str += '<option value="מ.ש מוסך איכות בע מ">מ.ש מוסך איכות בע מ</option>';
+        Name_options_str += '<option value="מאור גאנח מוסך ניסים גאנח">מאור גאנח מוסך ניסים גאנח</option>';
+        Name_options_str += '<option value="מאיה את לייבה מוסך קינג קארס">מאיה את לייבה מוסך קינג קארס</option>';
+        Name_options_str += '<option value="מאיר מרכזי שירות שות&apos; מוגבלת י-ם">מאיר מרכזי שירות שות&apos; מוגבלת י-ם</option>';
+        Name_options_str += '<option value="מאסטרקאר מוסכים מתקדמים בע מ">מאסטרקאר מוסכים מתקדמים בע מ</option>';
+        Name_options_str += '<option value="מגה פרונט ל.פ 2014 בע מ">מגה פרונט ל.פ 2014 בע מ</option>';
+        Name_options_str += '<option value="מגרש י.ש.אוחנה בע מ">מגרש י.ש.אוחנה בע מ</option>';
+        Name_options_str += '<option value="מדיאל רונן מוסך בן יהודה">מדיאל רונן מוסך בן יהודה</option>';
+        Name_options_str += '<option value="מדע מוסכי משאיות בע מ">מדע מוסכי משאיות בע מ</option>';
+        Name_options_str += '<option value="מובילים וייט קומינס בערבון מוגבל">מובילים וייט קומינס בערבון מוגבל</option>';
+        Name_options_str += '<option value="מוזס אברהם - צמיגי דוד">מוזס אברהם - צמיגי דוד</option>';
+        Name_options_str += '<option value="מוחמד אבו סף מוסך מחרוזת">מוחמד אבו סף מוסך מחרוזת</option>';
+        Name_options_str += '<option value="מוטו טאצ - דקר מזרחי">מוטו טאצ - דקר מזרחי</option>';
+        Name_options_str += '<option value="מוטו מד קסם תומר וגיל אביעד">מוטו מד קסם תומר וגיל אביעד</option>';
+        Name_options_str += '<option value="מוטו פיקס בע מ">מוטו פיקס בע מ</option>';
+        Name_options_str += '<option value="מוטור-אפ בע מ">מוטור-אפ בע מ</option>';
+        Name_options_str += '<option value="מוטורוני  לפיד בע ם">מוטורוני  לפיד בע ם</option>';
+        Name_options_str += '<option value="מוטי גנדי פרונט אקס">מוטי גנדי פרונט אקס</option>';
+        Name_options_str += '<option value="מוטי ניסים מכונאות כללית">מוטי ניסים מכונאות כללית</option>';
+        Name_options_str += '<option value="מויס נאדר את פדלון מוסך האחים">מויס נאדר את פדלון מוסך האחים</option>';
+        Name_options_str += '<option value="מוסך  מכלוף יהודה שירותי רכב">מוסך  מכלוף יהודה שירותי רכב</option>';
+        Name_options_str += '<option value="מוסך  מכלוף ישראל שירותי רכב">מוסך  מכלוף ישראל שירותי רכב</option>';
+        Name_options_str += '<option value="מוסך א. אהרון 2010 בע מ">מוסך א. אהרון 2010 בע מ</option>';
+        Name_options_str += '<option value="מוסך א.ד.מ. אבו קעיד אחמד">מוסך א.ד.מ. אבו קעיד אחמד</option>';
+        Name_options_str += '<option value="מוסך א.ש. שירותי מכונאות - אביב">מוסך א.ש. שירותי מכונאות - אביב</option>';
+        Name_options_str += '<option value="מוסך אבי צלח שרותי רכב בע מ">מוסך אבי צלח שרותי רכב בע מ</option>';
+        Name_options_str += '<option value="מוסך אדמונד עשה לי טוב בעמ">מוסך אדמונד עשה לי טוב בעמ</option>';
+        Name_options_str += '<option value="מוסך אור אל  א.ב.א.  בע מ">מוסך אור אל  א.ב.א.  בע מ</option>';
+        Name_options_str += '<option value="מוסך אורן את חנן בע מ">מוסך אורן את חנן בע מ</option>';
+        Name_options_str += '<option value="מוסך אחים קצב בע מ">מוסך אחים קצב בע מ</option>';
+        Name_options_str += '<option value="מוסך איילון.ס.(2006) שירות בע מ">מוסך איילון.ס.(2006) שירות בע מ</option>';
+        Name_options_str += '<option value="מוסך איציק">מוסך איציק</option>';
+        Name_options_str += '<option value="מוסך איציק - זאיבלב ולדיסלב">מוסך איציק - זאיבלב ולדיסלב</option>';
+        Name_options_str += '<option value="מוסך אלי כהן בע מ">מוסך אלי כהן בע מ</option>';
+        Name_options_str += '<option value="מוסך אליהו גמיל">מוסך אליהו גמיל</option>';
+        Name_options_str += '<option value="מוסך אקשטייןבע מ">מוסך אקשטייןבע מ</option>';
+        Name_options_str += '<option value="מוסך ארמי ראוי">מוסך ארמי ראוי</option>';
+        Name_options_str += '<option value="מוסך אשכנזי אליהו">מוסך אשכנזי אליהו</option>';
+        Name_options_str += '<option value="מוסך אשקלון - גויטע גבעתי רחמים">מוסך אשקלון - גויטע גבעתי רחמים</option>';
+        Name_options_str += '<option value="מוסך באר-שבע בן דוד">מוסך באר-שבע בן דוד</option>';
+        Name_options_str += '<option value="מוסך ביטרן בע מ">מוסך ביטרן בע מ</option>';
+        Name_options_str += '<option value="מוסך ביליה פחחות- שרלי">מוסך ביליה פחחות- שרלי</option>';
+        Name_options_str += '<option value="מוסך בסגנון אלפיים בעמ">מוסך בסגנון אלפיים בעמ</option>';
+        Name_options_str += '<option value="מוסך בראשית בע מ">מוסך בראשית בע מ</option>';
+        Name_options_str += '<option value="מוסך ברק ב ש )מ.ג.י.י.( בע מ">מוסך ברק ב ש )מ.ג.י.י.( בע מ</option>';
+        Name_options_str += '<option value="מוסך גולי בע מ">מוסך גולי בע מ</option>';
+        Name_options_str += '<option value="מוסך גורג פחחות וצבע בעמ">מוסך גורג פחחות וצבע בעמ</option>';
+        Name_options_str += '<option value="מוסך גלי בע מ">מוסך גלי בע מ</option>';
+        Name_options_str += '<option value="מוסך דוד מלכי">מוסך דוד מלכי</option>';
+        Name_options_str += '<option value="מוסך דידי שרותי רכב בע מ">מוסך דידי שרותי רכב בע מ</option>';
+        Name_options_str += '<option value="מוסך דיזל ראשלצ בעמ">מוסך דיזל ראשלצ בעמ</option>';
+        Name_options_str += '<option value="מוסך דרור מערכות בע מ">מוסך דרור מערכות בע מ</option>';
+        Name_options_str += '<option value="מוסך האושר">מוסך האושר</option>';
+        Name_options_str += '<option value="מוסך האח הגדול - תומר לוי">מוסך האח הגדול - תומר לוי</option>';
+        Name_options_str += '<option value="מוסך הדייקן - אבו אלקיען עלי">מוסך הדייקן - אבו אלקיען עלי</option>';
+        Name_options_str += '<option value="מוסך ההנדסאי -אבו סאלח חאתם">מוסך ההנדסאי -אבו סאלח חאתם</option>';
+        Name_options_str += '<option value="מוסך הוכמן בע מ">מוסך הוכמן בע מ</option>';
+        Name_options_str += '<option value="מוסך הזוהר - רפאל הרצל">מוסך הזוהר - רפאל הרצל</option>';
+        Name_options_str += '<option value="מוסך החולץ">מוסך החולץ</option>';
+        Name_options_str += '<option value="מוסך החרושת לפחחות וצבע בע מ">מוסך החרושת לפחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="מוסך הידרוסטופ נפתלי בע מ">מוסך הידרוסטופ נפתלי בע מ</option>';
+        Name_options_str += '<option value="מוסך הסמל בע מ">מוסך הסמל בע מ</option>';
+        Name_options_str += '<option value="מוסך העמק מרכזי בע מ">מוסך העמק מרכזי בע מ</option>';
+        Name_options_str += '<option value="מוסך הרצל בראל טיפטופ שרותי רכב">מוסך הרצל בראל טיפטופ שרותי רכב</option>';
+        Name_options_str += '<option value="מוסך השושנים יצחק יברגימוב">מוסך השושנים יצחק יברגימוב</option>';
+        Name_options_str += '<option value="מוסך וינה">מוסך וינה</option>';
+        Name_options_str += '<option value="מוסך ונטורה בע מ">מוסך ונטורה בע מ</option>';
+        Name_options_str += '<option value="מוסך ז&apos;בנר מאיר בע מ">מוסך ז&apos;בנר מאיר בע מ</option>';
+        Name_options_str += '<option value="מוסך זיוד נאיף">מוסך זיוד נאיף</option>';
+        Name_options_str += '<option value="מוסך זני רחובות בע מ">מוסך זני רחובות בע מ</option>';
+        Name_options_str += '<option value="מוסך ח&apos;ורי בסאם">מוסך ח&apos;ורי בסאם</option>';
+        Name_options_str += '<option value="מוסך חדאד ב.מ.וו בע מ">מוסך חדאד ב.מ.וו בע מ</option>';
+        Name_options_str += '<option value="מוסך טופז בע מ">מוסך טופז בע מ</option>';
+        Name_options_str += '<option value="מוסך יהודה אדמוני">מוסך יהודה אדמוני</option>';
+        Name_options_str += '<option value="מוסך יהודה ויאיר בע מ">מוסך יהודה ויאיר בע מ</option>';
+        Name_options_str += '<option value="מוסך יוסי כהן פחחות וצבע בע מ">מוסך יוסי כהן פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="מוסך יוסף את יוסף">מוסך יוסף את יוסף</option>';
+        Name_options_str += '<option value="מוסך יזדי פחחות וצבע 2001 בע מ">מוסך יזדי פחחות וצבע 2001 בע מ</option>';
+        Name_options_str += '<option value="מוסך ים התיכון (1990) בע מ">מוסך ים התיכון (1990) בע מ</option>';
+        Name_options_str += '<option value="מוסך ימית רושה בע מ">מוסך ימית רושה בע מ</option>';
+        Name_options_str += '<option value="מוסך ישראל זסלבסקיישראל סאשה">מוסך ישראל זסלבסקיישראל סאשה</option>';
+        Name_options_str += '<option value="מוסך ישראל טורס בעמ">מוסך ישראל טורס בעמ</option>';
+        Name_options_str += '<option value="מוסך מאירמן יחזקאל">מוסך מאירמן יחזקאל</option>';
+        Name_options_str += '<option value="מוסך מגן הנגב בע מ">מוסך מגן הנגב בע מ</option>';
+        Name_options_str += '<option value="מוסך מוטונל - אפי ואלון">מוסך מוטונל - אפי ואלון</option>';
+        Name_options_str += '<option value="מוסך מוטי יעל ליסינג בע מ">מוסך מוטי יעל ליסינג בע מ</option>';
+        Name_options_str += '<option value="מוסך מועלם - מועלם יוסף">מוסך מועלם - מועלם יוסף</option>';
+        Name_options_str += '<option value="מוסך מועלם צדוק בע מ">מוסך מועלם צדוק בע מ</option>';
+        Name_options_str += '<option value="מוסך מילאד בדיע יוסף בע מ">מוסך מילאד בדיע יוסף בע מ</option>';
+        Name_options_str += '<option value="מוסך מילניום ח.ר.בעמ">מוסך מילניום ח.ר.בעמ</option>';
+        Name_options_str += '<option value="מוסך מינו ברדה 1989 בעמ">מוסך מינו ברדה 1989 בעמ</option>';
+        Name_options_str += '<option value="מוסך מירון ה.ר.נ בע מ">מוסך מירון ה.ר.נ בע מ</option>';
+        Name_options_str += '<option value="מוסך מכל הלב">מוסך מכל הלב</option>';
+        Name_options_str += '<option value="מוסך מרכבת המשנה בע מ">מוסך מרכבת המשנה בע מ</option>';
+        Name_options_str += '<option value="מוסך מרכזי לרכב יפני חולון בע מ">מוסך מרכזי לרכב יפני חולון בע מ</option>';
+        Name_options_str += '<option value="מוסך נ. גבי פחחות וצבע 1996 בע מ">מוסך נ. גבי פחחות וצבע 1996 בע מ</option>';
+        Name_options_str += '<option value="מוסך נאג&apos;י 2004 בע מ">מוסך נאג&apos;י 2004 בע מ</option>';
+        Name_options_str += '<option value="מוסך ניר שרעבי">מוסך ניר שרעבי</option>';
+        Name_options_str += '<option value="מוסך נפתלי - אילן את מוטי נפתלי">מוסך נפתלי - אילן את מוטי נפתלי</option>';
+        Name_options_str += '<option value="מוסך סבנה בע מ">מוסך סבנה בע מ</option>';
+        Name_options_str += '<option value="מוסך סבנה חן פחחות בע מ">מוסך סבנה חן פחחות בע מ</option>';
+        Name_options_str += '<option value="מוסך סלוה וודים בע מ">מוסך סלוה וודים בע מ</option>';
+        Name_options_str += '<option value="מוסך ספיר - רביבו רפאל">מוסך ספיר - רביבו רפאל</option>';
+        Name_options_str += '<option value="מוסך עמיאל ב.ר. בע מ">מוסך עמיאל ב.ר. בע מ</option>';
+        Name_options_str += '<option value="מוסך עמרם שרותי רכב">מוסך עמרם שרותי רכב</option>';
+        Name_options_str += '<option value="מוסך פאר הרצליה 1995 בע מ">מוסך פאר הרצליה 1995 בע מ</option>';
+        Name_options_str += '<option value="מוסך פריצל דוד">מוסך פריצל דוד</option>';
+        Name_options_str += '<option value="מוסך צמרת - אביעד תומר">מוסך צמרת - אביעד תומר</option>';
+        Name_options_str += '<option value="מוסך קו העמק - אדמוב קסום">מוסך קו העמק - אדמוב קסום</option>';
+        Name_options_str += '<option value="מוסך קרל בע מ">מוסך קרל בע מ</option>';
+        Name_options_str += '<option value="מוסך קשת - ריעני שמעון">מוסך קשת - ריעני שמעון</option>';
+        Name_options_str += '<option value="מוסך רון אוחנה בע מ">מוסך רון אוחנה בע מ</option>';
+        Name_options_str += '<option value="מוסך ריזק">מוסך ריזק</option>';
+        Name_options_str += '<option value="מוסך רמ ר (1987)בע מ">מוסך רמ ר (1987)בע מ</option>';
+        Name_options_str += '<option value="מוסך רמות - פבליוקובסקי אלכסנדר">מוסך רמות - פבליוקובסקי אלכסנדר</option>';
+        Name_options_str += '<option value="מוסך שחם ובניו בעמ">מוסך שחם ובניו בעמ</option>';
+        Name_options_str += '<option value="מוסך שי געש">מוסך שי געש</option>';
+        Name_options_str += '<option value="מוסך שפיק וטל רכבים בע מ">מוסך שפיק וטל רכבים בע מ</option>';
+        Name_options_str += '<option value="מוסך שקד - סרגיי את יבגני">מוסך שקד - סרגיי את יבגני</option>';
+        Name_options_str += '<option value="מוסך שרון א.ח שירותי רכב">מוסך שרון א.ח שירותי רכב</option>';
+        Name_options_str += '<option value="מוסך תמם מגן ע.ג.ר. בע מ">מוסך תמם מגן ע.ג.ר. בע מ</option>';
+        Name_options_str += '<option value="מוסכי אביק שרותי רכב בעמ">מוסכי אביק שרותי רכב בעמ</option>';
+        Name_options_str += '<option value="מוסכי רפאלו - יהודה בוטביקה">מוסכי רפאלו - יהודה בוטביקה</option>';
+        Name_options_str += '<option value="מועלם שלמה - תיקון אגזוזים">מועלם שלמה - תיקון אגזוזים</option>';
+        Name_options_str += '<option value="מזרחי משה">מזרחי משה</option>';
+        Name_options_str += '<option value="מטר סלים מוסך אופן">מטר סלים מוסך אופן</option>';
+        Name_options_str += '<option value="מטרו מוטור שווק (1981) בע מ">מטרו מוטור שווק (1981) בע מ</option>';
+        Name_options_str += '<option value="מייזל את מאיר מוסך נירון">מייזל את מאיר מוסך נירון</option>';
+        Name_options_str += '<option value="מיכאל מוטורס">מיכאל מוטורס</option>';
+        Name_options_str += '<option value="מיכה בן שושן מוסך מיכאלי">מיכה בן שושן מוסך מיכאלי</option>';
+        Name_options_str += '<option value="מימד מרכז שירות בע מ">מימד מרכז שירות בע מ</option>';
+        Name_options_str += '<option value="מישאלוב אילן מוסך המהיר">מישאלוב אילן מוסך המהיר</option>';
+        Name_options_str += '<option value="מכאל את רפאל את דורון מוסך הצוות">מכאל את רפאל את דורון מוסך הצוות</option>';
+        Name_options_str += '<option value="מלגזות הדרום בע מ">מלגזות הדרום בע מ</option>';
+        Name_options_str += '<option value="מלכה חנניה מוסך הצוות">מלכה חנניה מוסך הצוות</option>';
+        Name_options_str += '<option value="ממסי שרותי דרך וגרירה בע מ">ממסי שרותי דרך וגרירה בע מ</option>';
+        Name_options_str += '<option value="מנו שמואל - מוסך מנו">מנו שמואל - מוסך מנו</option>';
+        Name_options_str += '<option value="מנשה את אלון מוסך הצמד">מנשה את אלון מוסך הצמד</option>';
+        Name_options_str += '<option value="מסה ניסים">מסה ניסים</option>';
+        Name_options_str += '<option value="מסעוד שיתי מוסך">מסעוד שיתי מוסך</option>';
+        Name_options_str += '<option value="מעוז שרותי רכב ת א בע מ">מעוז שרותי רכב ת א בע מ</option>';
+        Name_options_str += '<option value="מרי יוסף מוסך רם">מרי יוסף מוסך רם</option>';
+        Name_options_str += '<option value="מרכז הצמגים - תמיר כהן">מרכז הצמגים - תמיר כהן</option>';
+        Name_options_str += '<option value="מרכז שרות אוטו שי בע מ">מרכז שרות אוטו שי בע מ</option>';
+        Name_options_str += '<option value="מרכז שרות ברוש 2020 בע מ">מרכז שרות ברוש 2020 בע מ</option>';
+        Name_options_str += '<option value="מרכז שרות גילון י.מ. בע מ">מרכז שרות גילון י.מ. בע מ</option>';
+        Name_options_str += '<option value="מרכז שרות הבונים בע מ.">מרכז שרות הבונים בע מ.</option>';
+        Name_options_str += '<option value="מרכז שרות השניים תל אביב בע מ">מרכז שרות השניים תל אביב בע מ</option>';
+        Name_options_str += '<option value="מרכז שרות תכלת בע מ">מרכז שרות תכלת בע מ</option>';
+        Name_options_str += '<option value="מרקוס יעקב קארטיק ישראל">מרקוס יעקב קארטיק ישראל</option>';
+        Name_options_str += '<option value="משאלוב אלי אבי גל אופנועים">משאלוב אלי אבי גל אופנועים</option>';
+        Name_options_str += '<option value="משאלוב צפריר אופנועי הקריה">משאלוב צפריר אופנועי הקריה</option>';
+        Name_options_str += '<option value="משה אברהמי שרותי חשמל לרכב בע מ">משה אברהמי שרותי חשמל לרכב בע מ</option>';
+        Name_options_str += '<option value="משה את חנן שירותי רכב בע מ">משה את חנן שירותי רכב בע מ</option>';
+        Name_options_str += '<option value="משה ממן שרותי רכב">משה ממן שרותי רכב</option>';
+        Name_options_str += '<option value="משה פרץ צמיגי פרץ ובניו">משה פרץ צמיגי פרץ ובניו</option>';
+        Name_options_str += '<option value="משה קדוש צמיגי הפלד">משה קדוש צמיגי הפלד</option>';
+        Name_options_str += '<option value="משה שחרור מוסך הנכון">משה שחרור מוסך הנכון</option>';
+        Name_options_str += '<option value="משולם עוזיאל מוסך עוזי בייק">משולם עוזיאל מוסך עוזי בייק</option>';
+        Name_options_str += '<option value="משומר מוסך">משומר מוסך</option>';
+        Name_options_str += '<option value="נאוציצל ישראל חשמל רכב">נאוציצל ישראל חשמל רכב</option>';
+        Name_options_str += '<option value="נג&apos;ארי אבי מוסך מושון">נג&apos;ארי אבי מוסך מושון</option>';
+        Name_options_str += '<option value="נח טל מוסך טל">נח טל מוסך טל</option>';
+        Name_options_str += '<option value="נח פיזק - מוסך תיבת נח">נח פיזק - מוסך תיבת נח</option>';
+        Name_options_str += '<option value="נחום לבר מכון לאגזוזים השלושה">נחום לבר מכון לאגזוזים השלושה</option>';
+        Name_options_str += '<option value="נחלה נאדר פחחות רכב חיפה">נחלה נאדר פחחות רכב חיפה</option>';
+        Name_options_str += '<option value="ניסים את שלמה בע מ">ניסים את שלמה בע מ</option>';
+        Name_options_str += '<option value="ניסים ראשים  ניר  בע מ">ניסים ראשים  ניר  בע מ</option>';
+        Name_options_str += '<option value="ניסים תמם מוסך א-א">ניסים תמם מוסך א-א</option>';
+        Name_options_str += '<option value="ניקולא מוסך הרכב">ניקולא מוסך הרכב</option>';
+        Name_options_str += '<option value="ניקולא קצורובסקי - מוסך פנס נקי">ניקולא קצורובסקי - מוסך פנס נקי</option>';
+        Name_options_str += '<option value="נמרודי משה דודג רובר מכונאות">נמרודי משה דודג רובר מכונאות</option>';
+        Name_options_str += '<option value="נע נע בע מ">נע נע בע מ</option>';
+        Name_options_str += '<option value="נעם בני מוסך באג">נעם בני מוסך באג</option>';
+        Name_options_str += '<option value="נתן דזובולצקי - נתן את תובל">נתן דזובולצקי - נתן את תובל</option>';
+        Name_options_str += '<option value="נתנאל גזי בע מ">נתנאל גזי בע מ</option>';
+        Name_options_str += '<option value="ס.א.שירותי רכב בע מ">ס.א.שירותי רכב בע מ</option>';
+        Name_options_str += '<option value="סאלח מוטורוס בע מ">סאלח מוטורוס בע מ</option>';
+        Name_options_str += '<option value="סארב דעאס מוסך שני">סארב דעאס מוסך שני</option>';
+        Name_options_str += '<option value="סואעד כמאל מוסך כמאל">סואעד כמאל מוסך כמאל</option>';
+        Name_options_str += '<option value="סורני צדוק מוטו טי אל וי בעמ">סורני צדוק מוטו טי אל וי בעמ</option>';
+        Name_options_str += '<option value="סטופ ביג ליס קאר בע מ">סטופ ביג ליס קאר בע מ</option>';
+        Name_options_str += '<option value="סטייל ש.ח פחחות וצבע בע מ">סטייל ש.ח פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="סיבירצב אלכסנדר מוסך אוריון">סיבירצב אלכסנדר מוסך אוריון</option>';
+        Name_options_str += '<option value="סימן טוב תיקון אופנועים">סימן טוב תיקון אופנועים</option>';
+        Name_options_str += '<option value="סלמון יצחק מוסך סלמון">סלמון יצחק מוסך סלמון</option>';
+        Name_options_str += '<option value="סמרי זאיד - מוסך סמרי ובניו">סמרי זאיד - מוסך סמרי ובניו</option>';
+        Name_options_str += '<option value="סער גנים שרותי רכב">סער גנים שרותי רכב</option>';
+        Name_options_str += '<option value="ספיד בייק-אדיר ושוקי כהן">ספיד בייק-אדיר ושוקי כהן</option>';
+        Name_options_str += '<option value="ספיד סוכנויות בע מ">ספיד סוכנויות בע מ</option>';
+        Name_options_str += '<option value="סקסיק הני מוסך יפו למכונאות">סקסיק הני מוסך יפו למכונאות</option>';
+        Name_options_str += '<option value="סרנגה ישראל מוסך מעוז">סרנגה ישראל מוסך מעוז</option>';
+        Name_options_str += '<option value="עאמר בחוס - מוסך עאמר">עאמר בחוס - מוסך עאמר</option>';
+        Name_options_str += '<option value="עאמר מחמוד מוסך צק פוסט">עאמר מחמוד מוסך צק פוסט</option>';
+        Name_options_str += '<option value="עוזי דרויש צמיגי מוריס">עוזי דרויש צמיגי מוריס</option>';
+        Name_options_str += '<option value="עויס האני מוסך אור לוד">עויס האני מוסך אור לוד</option>';
+        Name_options_str += '<option value="עופר חברה לרכב בע מ">עופר חברה לרכב בע מ</option>';
+        Name_options_str += '<option value="עזר אנטון מוסך מוטו טוני">עזר אנטון מוסך מוטו טוני</option>';
+        Name_options_str += '<option value="עזריאל רונן מוסך אור קור">עזריאל רונן מוסך אור קור</option>';
+        Name_options_str += '<option value="עזריה אריה מוסך טיל">עזריה אריה מוסך טיל</option>';
+        Name_options_str += '<option value="עידן - י.ל.מ. מרכז הרכב בע מ">עידן - י.ל.מ. מרכז הרכב בע מ</option>';
+        Name_options_str += '<option value="עמיאל ג&apos;רבי - פחחות עמיאל יוסף">עמיאל ג&apos;רבי - פחחות עמיאל יוסף</option>';
+        Name_options_str += '<option value="עמיגל סוכנויות ושירותים בע מ">עמיגל סוכנויות ושירותים בע מ</option>';
+        Name_options_str += '<option value="עמירם רייזברג מוסך סער">עמירם רייזברג מוסך סער</option>';
+        Name_options_str += '<option value="עמר שלמה">עמר שלמה</option>';
+        Name_options_str += '<option value="פחח השלום בע מ">פחח השלום בע מ</option>';
+        Name_options_str += '<option value="פחחות וצבע הכוכב נחלה בע מ">פחחות וצבע הכוכב נחלה בע מ</option>';
+        Name_options_str += '<option value="פחחות רכב דרום מירו )מאיר( בע מ">פחחות רכב דרום מירו )מאיר( בע מ</option>';
+        Name_options_str += '<option value="פליקס בע מ">פליקס בע מ</option>';
+        Name_options_str += '<option value="פנחס שי מוסך מירז">פנחס שי מוסך מירז</option>';
+        Name_options_str += '<option value="פניני משה מוסך פניני">פניני משה מוסך פניני</option>';
+        Name_options_str += '<option value="פרג&apos; רחמים שרותי רכב">פרג&apos; רחמים שרותי רכב</option>';
+        Name_options_str += '<option value="פרמון דני מוסך מרקו">פרמון דני מוסך מרקו</option>';
+        Name_options_str += '<option value="פרנסיס אריה מוסך חיים">פרנסיס אריה מוסך חיים</option>';
+        Name_options_str += '<option value="צמיג ותקר - נורווינד רן">צמיג ותקר - נורווינד רן</option>';
+        Name_options_str += '<option value="צמיגי אור - לדני אור">צמיגי אור - לדני אור</option>';
+        Name_options_str += '<option value="צמיגי איתן כחלון הרצליה בע מ">צמיגי איתן כחלון הרצליה בע מ</option>';
+        Name_options_str += '<option value="צמיגי בן אליהו בע מ">צמיגי בן אליהו בע מ</option>';
+        Name_options_str += '<option value="צמיגי הקניון אסייג 1999 בע מ">צמיגי הקניון אסייג 1999 בע מ</option>';
+        Name_options_str += '<option value="צמיגי השדרה כריסטו">צמיגי השדרה כריסטו</option>';
+        Name_options_str += '<option value="צמיגי זיתוני">צמיגי זיתוני</option>';
+        Name_options_str += '<option value="צמיגי חנניה בע מ">צמיגי חנניה בע מ</option>';
+        Name_options_str += '<option value="צמיגי יוסי זוארץ (1994) בע מ">צמיגי יוסי זוארץ (1994) בע מ</option>';
+        Name_options_str += '<option value="צפאני יחזקאל שרות יחזקאל">צפאני יחזקאל שרות יחזקאל</option>';
+        Name_options_str += '<option value="צרפתי יהודה וישראל בעמ">צרפתי יהודה וישראל בעמ</option>';
+        Name_options_str += '<option value="ק.ס מוסך שבתאי שמר  בע מ">ק.ס מוסך שבתאי שמר  בע מ</option>';
+        Name_options_str += '<option value="קבוצת שגריר שירותי רכב בע מ">קבוצת שגריר שירותי רכב בע מ</option>';
+        Name_options_str += '<option value="קובי ורפאל מוסכי ורד">קובי ורפאל מוסכי ורד</option>';
+        Name_options_str += '<option value="קוגמן שירותי רכב בע מ">קוגמן שירותי רכב בע מ</option>';
+        Name_options_str += '<option value="קומאנד קאר פחחות וצבע בע מ">קומאנד קאר פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="קומפיוטסט הנדסת ציוד לרכב בע מ">קומפיוטסט הנדסת ציוד לרכב בע מ</option>';
+        Name_options_str += '<option value="קונברטורים בע מ">קונברטורים בע מ</option>';
+        Name_options_str += '<option value="קופמן ישראל מוסך">קופמן ישראל מוסך</option>';
+        Name_options_str += '<option value="קזנטיני שלום ועמוס צמיגי קזנטיני">קזנטיני שלום ועמוס צמיגי קזנטיני</option>';
+        Name_options_str += '<option value="קליינברג זאב - עוצמת אור">קליינברג זאב - עוצמת אור</option>';
+        Name_options_str += '<option value="קפיצים לרכב חמילבסקי בע מ">קפיצים לרכב חמילבסקי בע מ</option>';
+        Name_options_str += '<option value="קרן משאבות בע מ">קרן משאבות בע מ</option>';
+        Name_options_str += '<option value="קרסו מוטורס (2007) בע מ">קרסו מוטורס (2007) בע מ</option>';
+        Name_options_str += '<option value="קשר רנט - א- קאר בע מ">קשר רנט - א- קאר בע מ</option>';
+        Name_options_str += '<option value="קשר רנט א-קאר בע מ">קשר רנט א-קאר בע מ</option>';
+        Name_options_str += '<option value="ר. נאם שרות וחלפים בע מ">ר. נאם שרות וחלפים בע מ</option>';
+        Name_options_str += '<option value="ר.ג.א.)ישראל( 1987 בע מ">ר.ג.א.)ישראל( 1987 בע מ</option>';
+        Name_options_str += '<option value="רואה שי ש.ח. אופנועים">רואה שי ש.ח. אופנועים</option>';
+        Name_options_str += '<option value="רובין כדורי מוסך כדורי">רובין כדורי מוסך כדורי</option>';
+        Name_options_str += '<option value="רובל משה תיקון רדיאטורים">רובל משה תיקון רדיאטורים</option>';
+        Name_options_str += '<option value="רובס בני מכונאות">רובס בני מכונאות</option>';
+        Name_options_str += '<option value="רוזיו יצחק מוסך איזקי">רוזיו יצחק מוסך איזקי</option>';
+        Name_options_str += '<option value="רוסלן שלומוב מוסך איש הפח">רוסלן שלומוב מוסך איש הפח</option>';
+        Name_options_str += '<option value="רועי את מנצור דוקטורי 2000">רועי את מנצור דוקטורי 2000</option>';
+        Name_options_str += '<option value="רז גפני אבנוע סנטר">רז גפני אבנוע סנטר</option>';
+        Name_options_str += '<option value="רייחנוב מיכאל סיאו סנטר">רייחנוב מיכאל סיאו סנטר</option>';
+        Name_options_str += '<option value="ריינו - טייר ישראל בע מ">ריינו - טייר ישראל בע מ</option>';
+        Name_options_str += '<option value="רכב דוד מוסכים ש.ר.ד 1995 בע מ">רכב דוד מוסכים ש.ר.ד 1995 בע מ</option>';
+        Name_options_str += '<option value="רכב המאה ניב פורמן בע מ">רכב המאה ניב פורמן בע מ</option>';
+        Name_options_str += '<option value="רכב מיטל בע מ לפחחות וצבע לרכב">רכב מיטל בע מ לפחחות וצבע לרכב</option>';
+        Name_options_str += '<option value="רמי אבייט מרכז הגירים">רמי אבייט מרכז הגירים</option>';
+        Name_options_str += '<option value="ש. קלעי ובנו בע מ">ש. קלעי ובנו בע מ</option>';
+        Name_options_str += '<option value="ש.א. המעבדה לרכב (2005) בע מ">ש.א. המעבדה לרכב (2005) בע מ</option>';
+        Name_options_str += '<option value="ש.צ מוסך דרור בע מ">ש.צ מוסך דרור בע מ</option>';
+        Name_options_str += '<option value="שואף אריה צמיגים">שואף אריה צמיגים</option>';
+        Name_options_str += '<option value="שומלי נזאר - בית מלאכה לדיזל נ.ש">שומלי נזאר - בית מלאכה לדיזל נ.ש</option>';
+        Name_options_str += '<option value="שומרון דוד צמיגי יהלום">שומרון דוד צמיגי יהלום</option>';
+        Name_options_str += '<option value="שועה אדמונד מוסך אדמונד">שועה אדמונד מוסך אדמונד</option>';
+        Name_options_str += '<option value="שחל חשמלאות רכב אלכס">שחל חשמלאות רכב אלכס</option>';
+        Name_options_str += '<option value="שיא סוכנויות רכב שחודה 2000 בע מ">שיא סוכנויות רכב שחודה 2000 בע מ</option>';
+        Name_options_str += '<option value="שירותי רכב רוממה">שירותי רכב רוממה</option>';
+        Name_options_str += '<option value="שלום כהן שירותי רכב בע מ">שלום כהן שירותי רכב בע מ</option>';
+        Name_options_str += '<option value="שלומי איסקוב פחחות וצבע בע מ">שלומי איסקוב פחחות וצבע בע מ</option>';
+        Name_options_str += '<option value="שלישיית האחים גלמאנה בע מ">שלישיית האחים גלמאנה בע מ</option>';
+        Name_options_str += '<option value="שלמה לוי מוסך המלאכה">שלמה לוי מוסך המלאכה</option>';
+        Name_options_str += '<option value="שלמה שקורי מוסך הודיה">שלמה שקורי מוסך הודיה</option>';
+        Name_options_str += '<option value="שם טוב יגאל - מוסך יגאל">שם טוב יגאל - מוסך יגאל</option>';
+        Name_options_str += '<option value="שמואלוב אליעזר - מוסך אהרון">שמואלוב אליעזר - מוסך אהרון</option>';
+        Name_options_str += '<option value="שמעון זנקו מוסך צוות לעניין">שמעון זנקו מוסך צוות לעניין</option>';
+        Name_options_str += '<option value="שני קאר בע מ">שני קאר בע מ</option>';
+        Name_options_str += '<option value="שניר עוסמאן יהלום הצבע">שניר עוסמאן יהלום הצבע</option>';
+        Name_options_str += '<option value="שעיא סמיר">שעיא סמיר</option>';
+        Name_options_str += '<option value="שפרבר החברה לפיננסים והשקעות בעמ">שפרבר החברה לפיננסים והשקעות בעמ</option>';
+        Name_options_str += '<option value="שרון בן אדיבה מוסך מרכז הרכב">שרון בן אדיבה מוסך מרכז הרכב</option>';
+        Name_options_str += '<option value="שרות אוטומובילים - וייס אמנון">שרות אוטומובילים - וייס אמנון</option>';
+        Name_options_str += '<option value="שרות לצמיגים קחלון ובניו בע מ">שרות לצמיגים קחלון ובניו בע מ</option>';
+        Name_options_str += '<option value="שרותי כיוון פרונט התחייה בע מ">שרותי כיוון פרונט התחייה בע מ</option>';
+        Name_options_str += '<option value="שרותי רכב ישראל ואבי בע מ">שרותי רכב ישראל ואבי בע מ</option>';
+        Name_options_str += '<option value="שרף אילן מוסך פנחס">שרף אילן מוסך פנחס</option>';
+        Name_options_str += '<option value="שש - צ2011 בע מ">שש - צ2011 בע מ</option>';
+        Name_options_str += '<option value="תאמר עודה - צמיגי אדם">תאמר עודה - צמיגי אדם</option>';
+        Name_options_str += '<option value="תיבות הילוכים אוטומטיים בע מ">תיבות הילוכים אוטומטיים בע מ</option>';
+        Name_options_str += '<option value="תמימי איימן מוסך האורגים">תמימי איימן מוסך האורגים</option>';
+        Name_options_str += '<option value="תמיר את אביב אופנועי חולון">תמיר את אביב אופנועי חולון</option>';
+        Name_options_str += '<option value="תמיר את ניצן מוסך טיימינג">תמיר את ניצן מוסך טיימינג</option>';
+        sel_Name.innerHTML = Name_options_str;
+        div_Name.appendChild(sel_Name);
+        var lab_Name = document.createElement('div');
+        lab_Name.innerHTML = 'שם מוסך';
+        lab_Name.className = 'filterlabel';
+        div_Name.appendChild(lab_Name);
+        var reset_Name = document.createElement('div');
+        reset_Name.innerHTML = 'נקה פילטר';
+        reset_Name.className = 'filterlabel';
+        reset_Name.onclick = function () {
+            var options = document.getElementById("sel_Name").options;
+            for (var i = 0; i < options.length; i++) {
+                options[i].selected = false;
+            }
+            filterFunc();
+        };
+        div_Name.appendChild(reset_Name);
+        document.getElementById("menu").appendChild(
+            document.createElement("div"));
+        var div_Weekdays = document.createElement('div');
+        div_Weekdays.id = "div_Weekdays";
+        div_Weekdays.className = "filterselect";
+        document.getElementById("menu").appendChild(div_Weekdays);
+        sel_Weekdays = document.createElement('select');
+        sel_Weekdays.multiple = true;
+        sel_Weekdays.size = 4;
+        sel_Weekdays.id = "sel_Weekdays";
+        var Weekdays_options_str = "<option value='' unselected></option>";
+        sel_Weekdays.onchange = function () { filterFunc() };
+        Weekdays_options_str += '<option value="07:00 - 16:00">07:00 - 16:00</option>';
+        Weekdays_options_str += '<option value="07:00 - 16:30">07:00 - 16:30</option>';
+        Weekdays_options_str += '<option value="07:00 - 17:00">07:00 - 17:00</option>';
+        sel_Weekdays.innerHTML = Weekdays_options_str;
+        div_Weekdays.appendChild(sel_Weekdays);
+        var lab_Weekdays = document.createElement('div');
+        lab_Weekdays.innerHTML = 'שעות פעילות ימים א-ה';
+        lab_Weekdays.className = 'filterlabel';
+        div_Weekdays.appendChild(lab_Weekdays);
+        var reset_Weekdays = document.createElement('div');
+        reset_Weekdays.innerHTML = 'נקה פילטר';
+        reset_Weekdays.className = 'filterlabel';
+        reset_Weekdays.onclick = function () {
+            var options = document.getElementById("sel_Weekdays").options;
+            for (var i = 0; i < options.length; i++) {
+                options[i].selected = false;
+            }
+            filterFunc();
+        };
+        div_Weekdays.appendChild(reset_Weekdays);
+        document.getElementById("menu").appendChild(
+            document.createElement("div"));
+        var div_Services = document.createElement('div');
+        div_Services.id = "div_Services";
+        div_Services.className = "filterselect";
+        document.getElementById("menu").appendChild(div_Services);
+        sel_Services = document.createElement('select');
+        sel_Services.multiple = true;
+        sel_Services.size = 5;
+        sel_Services.id = "sel_Services";
+        var Services_options_str = "<option value='' unselected></option>";
+        sel_Services.onchange = function () { filterFunc() };
+        Services_options_str += '<option value="אוטוטק מרכבי רכב וצביעתם">אוטוטק מרכבי רכב וצביעתם</option>';
+        Services_options_str += '<option value="אוטוטק רכב קל">אוטוטק רכב קל</option>';
+        Services_options_str += '<option value="אישור כשירות לצמ ה ומכונה ניידת">אישור כשירות לצמ ה ומכונה ניידת</option>';
+        Services_options_str += '<option value="בדיקות-רכב )קניה ומכירה)">בדיקות-רכב )קניה ומכירה)</option>';
+        Services_options_str += '<option value="זגגות רכב">זגגות רכב</option>';
+        Services_options_str += '<option value="חשמלאות רכב">חשמלאות רכב</option>';
+        Services_options_str += '<option value="טרקטורים ומכונות ניידות">טרקטורים ומכונות ניידות</option>';
+        Services_options_str += '<option value="מוסך נייד לחילוץ ולתיקוני חירום">מוסך נייד לחילוץ ולתיקוני חירום</option>';
+        Services_options_str += '<option value="מכונאות אופנועים וקטנועים">מכונאות אופנועים וקטנועים</option>';
+        Services_options_str += '<option value="מכונאות רכב בנזין">מכונאות רכב בנזין</option>';
+        Services_options_str += '<option value="מכונאות רכב דיזל">מכונאות רכב דיזל</option>';
+        Services_options_str += '<option value="מסגרות רכב )תיקון ארגזים)">מסגרות רכב )תיקון ארגזים)</option>';
+        Services_options_str += '<option value="צבעות רכב">צבעות רכב</option>';
+        Services_options_str += '<option value="רפידות ותופי בלם">רפידות ותופי בלם</option>';
+        Services_options_str += '<option value="שיפוץ מכללי בלמים">שיפוץ מכללי בלמים</option>';
+        Services_options_str += '<option value="שירות תיקון למזגן אויר לרכב">שירות תיקון למזגן אויר לרכב</option>';
+        Services_options_str += '<option value="תחזוקה ובדיקת מערכת כיבוי אש באוטו&apos;">תחזוקה ובדיקת מערכת כיבוי אש באוטו&apos;</option>';
+        Services_options_str += '<option value="תיקון אחזקת רכב חשמלי/היברידי">תיקון אחזקת רכב חשמלי/היברידי</option>';
+        Services_options_str += '<option value="תיקון והחלפת צמיגים">תיקון והחלפת צמיגים</option>';
+        Services_options_str += '<option value="תיקון וכוון מתלים ברכב">תיקון וכוון מתלים ברכב</option>';
+        Services_options_str += '<option value="תיקון טרקטורונים">תיקון טרקטורונים</option>';
+        Services_options_str += '<option value="תיקון מחוונים">תיקון מחוונים</option>';
+        Services_options_str += '<option value="תיקון מרכבי רכב">תיקון מרכבי רכב</option>';
+        Services_options_str += '<option value="תיקון משאבות ומתזים לדיזל">תיקון משאבות ומתזים לדיזל</option>';
+        Services_options_str += '<option value="תיקון צנורות פליטה ודודי עמם">תיקון צנורות פליטה ודודי עמם</option>';
+        Services_options_str += '<option value="תיקון קפיצים ברכב מנועי">תיקון קפיצים ברכב מנועי</option>';
+        Services_options_str += '<option value="תיקון קרבורטורים">תיקון קרבורטורים</option>';
+        Services_options_str += '<option value="תיקון רדיאטורים )מצננים)">תיקון רדיאטורים )מצננים)</option>';
+        Services_options_str += '<option value="תיקון תיבות הילוכים אוטומטיות">תיקון תיבות הילוכים אוטומטיות</option>';
+        sel_Services.innerHTML = Services_options_str;
+        div_Services.appendChild(sel_Services);
+        var lab_Services = document.createElement('div');
+        lab_Services.innerHTML = 'שירותי מוסך';
+        lab_Services.className = 'filterlabel';
+        div_Services.appendChild(lab_Services);
+        var reset_Services = document.createElement('div');
+        reset_Services.innerHTML = 'נקה פילטר';
+        reset_Services.className = 'filterlabel';
+        reset_Services.onclick = function () {
+            var options = document.getElementById("sel_Services").options;
+            for (var i = 0; i < options.length; i++) {
+                options[i].selected = false;
+            }
+            filterFunc();
+        };
+        div_Services.appendChild(reset_Services);
+        document.getElementById("menu").appendChild(
+            document.createElement("div"));
+        var div_Friday = document.createElement('div');
+        div_Friday.id = "div_Friday";
+        div_Friday.className = "filterselect";
+        document.getElementById("menu").appendChild(div_Friday);
+        sel_Friday = document.createElement('select');
+        sel_Friday.multiple = true;
+        sel_Friday.size = 4;
+        sel_Friday.id = "sel_Friday";
+        var Friday_options_str = "<option value='' unselected></option>";
+        sel_Friday.onchange = function () { filterFunc() };
+        Friday_options_str += '<option value="07:00 - 12:00">07:00 - 12:00</option>';
+        Friday_options_str += '<option value="07:00 - 12:30">07:00 - 12:30</option>';
+        Friday_options_str += '<option value="07:00 - 13:00">07:00 - 13:00</option>';
+        Friday_options_str += '<option value="סגור">סגור</option>';
+        sel_Friday.innerHTML = Friday_options_str;
+        div_Friday.appendChild(sel_Friday);
+        var lab_Friday = document.createElement('div');
+        lab_Friday.innerHTML = 'שעות פעילות ימי שישי';
+        lab_Friday.className = 'filterlabel';
+        div_Friday.appendChild(lab_Friday);
+        var reset_Friday = document.createElement('div');
+        reset_Friday.innerHTML = 'נקה פילטר';
+        reset_Friday.className = 'filterlabel';
+        reset_Friday.onclick = function () {
+            var options = document.getElementById("sel_Friday").options;
+            for (var i = 0; i < options.length; i++) {
+                options[i].selected = false;
+            }
+            filterFunc();
+        };
+        div_Friday.appendChild(reset_Friday);
+        resetLabels([layer_israel_garages_new_grid_1]);
+        map.on("zoomend", function () {
+            resetLabels([layer_israel_garages_new_grid_1]);
+        });
+        map.on("layeradd", function () {
+            resetLabels([layer_israel_garages_new_grid_1]);
+        });
+        map.on("layerremove", function () {
+            resetLabels([layer_israel_garages_new_grid_1]);
+        });
+    </script>
+    <script src="../JS/navigation.js"></script>
+    <script src="../JS/sessionHandler.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>צור קשר</title>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.css" />
+    <link rel="stylesheet" href="../css/contact.css">
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">דף הבית</a>
+    </nav>
+    <div class="container">
+        <h1 class="brand"><span>GMAP</span> צור קשר</h1>
+        <div class="wrapper">
+            <div class="company-info">
+                <h3>GMAP - מיפוי מוסכים</h3>
+                <ul>
+                    <li><i class="fa fa-road"></i> תל אביב, ישראל</li>
+                    <li><i class="fa fa-phone"></i> 054-12345678</li>
+                    <li><i class="fa fa-envelope"></i> mail@gmap.com</li>
+                </ul>
+            </div>
+            <div class="contact">
+                <h3>צור קשר</h3>
+                <div class="alert">פנייתך נשלחה בהצלחה</div>
+                <form id="contactForm">
+                    <p>
+                        <label>שם</label>
+                        <input type="text" name="name" id="name" required>
+                    </p>
+                    <p>
+                        <label>כתובת מוסך</label>
+                        <input type="text" name="address" id="address">
+                    </p>
+                    <p>
+                        <label>כתובת אימייל</label>
+                        <input type="email" name="email" id="email" required>
+                    </p>
+                    <p>
+                        <label>מספר טלפון</label>
+                        <input type="text" name="phone" id="phone" required>
+                    </p>
+                    <p class="full">
+                        <label>סיבת הפניה</label>
+                        <textarea name="message" rows="5" id="message"></textarea>
+                    </p>
+                    <p class="full">
+                        <button type="submit">שלח</button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="../JS/contact.js"></script>
+</body>
+
+</html>

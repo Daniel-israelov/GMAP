@@ -1,0 +1,27 @@
+#navbar {
+    background-color: #c9e6ff;
+    color: black;
+}
+
+#navbar ul {
+    margin-left: 15px;
+    padding: 5px;
+    list-style: none;
+    text-align: center;
+}
+
+#navbar li {
+    display: inline;
+    margin-right: 5px;
+}
+
+#navbar a {
+    color: black;
+    text-decoration: none;
+    font-size: 18px;
+    padding-right: 15px;
+}
+
+.container {
+    margin: -0.5%;
+}

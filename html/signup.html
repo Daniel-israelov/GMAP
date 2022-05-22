@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="heb">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/signupStyle.css">
+    <title>הרשמה</title>
+</head>
+
+<body>
+    <nav>
+        <a href="index.html">דף הבית</a>
+    </nav>
+    <header>
+        <h1>הרשמה</h1>
+    </header>
+
+    <section class="container">
+        <form id="signup-form">
+            <div>
+                <label for="garage-manager"><strong>שם מנהל מוסך:</strong></label>
+                <input list="managers" name="manager" id="garage-owner">
+                <datalist id="managers"></datalist>
+                </input>
+            </div>
+            <div>
+                <label for="garage-name"><strong> שם מוסך:</strong></label>
+                <input type="text" id="garage-name" disabled>
+            </div>
+            <div>
+                <label for="address"><strong> כתובת:</strong></label>
+                <input type="text" id="address" disabled>
+            </div>
+            <div>
+                <label for="city"><strong> עיר:</strong></label>
+                <input type="text" id="city" disabled>
+            </div>
+            <div>
+                <label for="phone"><strong> טלפון:</strong></label>
+                <input type="text" id="phone" disabled>
+            </div>
+            <div>
+                <label for="email"><strong> אימייל:</strong></label>
+                <input type="text" id="email">
+            </div>
+            <div>
+                <label for="password"><strong> בחר סיסמה:</strong></label>
+                <input type="password" id="password">
+            </div>
+            <input class="btn" type="submit" value="לחץ להרשמה">
+        </form>
+    </section>
+    <script type="module" src="../JS/signup.js"></script>
+</body>
+
+</html>
