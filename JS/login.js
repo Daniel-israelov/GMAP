@@ -22,7 +22,7 @@ function onSubmit(e) {
             sessionStorage.setItem("email", email)
             sessionStorage.setItem("password", password)
             sessionStorage.setItem("user", user.uid)
-            window.location.replace("index.html")
+            window.location.replace("../index.html")
         })
         .catch((error) => {
             const errorCode = error.code;

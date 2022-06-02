@@ -1,6 +1,6 @@
 if (sessionStorage.getItem("user") != null) {
-    switch_links('signup-ref', "חשבון", "user_settings.html", "profile-ref");
-    switch_links('login-ref', "התנתק", "user_settings.html", "logout-ref");
+    switch_links('signup-ref', "חשבון", "../html/user_settings.html", "profile-ref");
+    switch_links('login-ref', "התנתק", "../html/user_settings.html", "logout-ref");
 }
 
 function logout(e) {
