@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="../css/L.Control.Locate.min.css">
     <link rel="stylesheet" href="../css/qgis2web.css">
     <link rel="stylesheet" href="../css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="../css/MarkerCluster.css">
+    <link rel="stylesheet" href="../css/MarkerCluster.Default.css">
     <link rel="stylesheet" href="../css/filter.css">
     <link rel="stylesheet" href="../css/nouislider.min.css">
     <link rel="stylesheet" href="../css/leaflet-control-geocoder.Geocoder.css">
@@ -56,6 +58,7 @@
     <script src="../JS/tailDT.js"></script>
     <script src="../JS/nouislider.min.js"></script>
     <script src="../JS/wNumb.js"></script>
+    <script src="../JS/leaflet.markercluster.js"></script>
     <script src="../data/israel_garages_new_grid_1.js"></script>
     <script>
         var highlightLayer;
@@ -450,11 +453,30 @@
                     feature: feature,
                     variables: {}
                 };
-                return L.circleMarker(latlng, style_israel_garages_new_grid_1_0(feature));
+                //return L.circleMarker(latlng, style_israel_garages_new_grid_1_0(feature));
+                return L.marker(latlng, style_israel_garages_new_grid_1_0(feature));
             },
         });
+
+
+        /*--->>> CLUSTERING <<<---*/
+        var cluster_israel_garages_new_grid_1 = new L.MarkerClusterGroup({
+            showCoverageOnHover: false,
+            spiderfyDistanceMultiplier: 2
+        });
+        cluster_israel_garages_new_grid_1.addLayer(layer_israel_garages_new_grid_1);
+        /*--->>> CLUSTERING <<<---*/
+
+
         bounds_group.addLayer(layer_israel_garages_new_grid_1);
-        map.addLayer(layer_israel_garages_new_grid_1);
+
+        /*--->>> CLUSTERING <<<---*/
+        cluster_israel_garages_new_grid_1.addTo(map);
+        map.addLayer(cluster_israel_garages_new_grid_1);
+        /*--->>> CLUSTERING <<<---*/
+
+
+        //map.addLayer(layer_israel_garages_new_grid_1);
         var osmGeocoder = new L.Control.Geocoder({
             collapsed: true,
             position: 'topleft',
@@ -466,6 +488,7 @@
         document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
             .title += 'Search for a place';
         setBounds();
+
         var mapDiv = document.getElementById('map');
         var row = document.createElement('div');
         row.className = "row";
